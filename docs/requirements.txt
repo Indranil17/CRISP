@@ -7,7 +7,7 @@ pandas
 plotly
 networkx
 ase
-fpsample==0.3.3
+fpsample==1.0.0
 scikit-learn
 jupyter
 sphinx
