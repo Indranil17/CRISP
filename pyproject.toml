@@ -64,7 +64,7 @@ distance-dirty = "{base_version}.post{distance}.dev0"
 [tool.versioningit.vcs]
 method = "git"
 match = ["*"]
-default-tag = "1.0.1"
+default-tag = "1.1.0"
 
 [tool.versioningit.write]
 file = "CRISP/_version.py"

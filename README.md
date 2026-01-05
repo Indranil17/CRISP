@@ -2,8 +2,8 @@ CRISP
 ==============================
 [//]: # (Badges)
 [![Documentation Status](https://readthedocs.org/projects/crisp-host/badge/?version=latest)](https://crisp-host.readthedocs.io/en/latest/?badge=latest)
-[![PyPI version](https://badge.fury.io/py/CRISP.svg)](https://badge.fury.io/py/CRISP)
-[![Python Version](https://img.shields.io/pypi/pyversions/CRISP.svg)](https://pypi.org/project/CRISP/)
+[![PyPI version](https://badge.fury.io/py/crisp-ase.svg)](https://badge.fury.io/py/crisp-ase)
+[![Python Version](https://img.shields.io/pypi/pyversions/crisp-ase.svg)](https://pypi.org/project/crisp-ase/)
 [![License](https://img.shields.io/github/license/Indranil17/CRISP_HOST.svg)](https://github.com/Indranil17/CRISP_HOST/blob/main/LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/YOUR_DOI.svg)](https://doi.org/YOUR_DOI)
 
@@ -70,7 +70,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 # Installation
 - Recommended: install from PyPI (tested on Python 3.9–3.11 on Linux/macOS/Windows)
 	```
-	pip install CRISP-ase
+	pip install crisp-ase==1.1.0
 	```
 
 - From a local checkout (same supported Python versions)
