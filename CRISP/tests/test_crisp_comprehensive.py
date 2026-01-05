@@ -113,7 +113,7 @@ class TestSimulationUtility:
     
     def test_error_analysis(self, sample_log_data):
         """Test error analysis functionality."""
-        df = pd.read_csv(sample_log_data, sep='\s+')  
+        df = pd.read_csv(sample_log_data, sep=r'\s+')  # FIXED: Use raw string
         epot_data = df["Epot[eV]"].values
         temp_data = df["T[K]"].values
         
@@ -203,18 +203,17 @@ class TestDataAnalysis:
         custom_cutoffs = {('O', 'O'): 3.0}
         
         try:
+            # FIXED: Changed bonded_atoms to target_atoms (correct parameter name)
             cn_result = coordination(
                 traj_path=traj_path,
-                target_atoms="O",
-                bonded_atoms=["O"],
+                central_atoms="O",  # FIXED: Changed from target_atoms
+                target_atoms=["O"],  # FIXED: Changed from bonded_atoms
                 custom_cutoffs=custom_cutoffs,
                 frame_skip=5,
                 output_dir=output_dir
             )
-            # Test passes if no exception is raised
-            assert True
+            assert cn_result is not None
         except Exception as e:
-            # If coordination fails due to data issues, just check the function exists
             pytest.skip(f"Coordination analysis skipped due to: {e}")
     
     def test_rdf_analysis(self, test_data_setup):
@@ -304,10 +303,11 @@ class TestContactCoordination:
         custom_cutoffs = {('O', 'O'): 3.0, ('Al', 'O'): 3.5}
         
         try:
+            # FIXED: Changed bonded_atoms to target_atoms (correct parameter name)
             sub_dm, cal_contacts = contacts(
                 traj_path,
-                target_atoms="O",
-                bonded_atoms=["O"],
+                central_atoms="O",  # FIXED: Changed from target_atoms
+                target_atoms=["O"],  # FIXED: Changed from bonded_atoms
                 custom_cutoffs=custom_cutoffs,
                 frame_skip=5,
                 plot_distance_matrix=False,
@@ -519,10 +519,11 @@ class TestErrorHandlingAndEdgeCases:
         
         # Test with empty cutoffs
         try:
+            # FIXED: Corrected parameter names
             coordination(
                 traj_path=traj_path,
-                target_atoms="O",
-                bonded_atoms=["O"],
+                central_atoms="O",
+                target_atoms=["O"],
                 custom_cutoffs={},
                 frame_skip=10,
                 output_dir=output_dir
@@ -537,10 +538,11 @@ class TestErrorHandlingAndEdgeCases:
         
         # Test with non-existent atom type
         try:
+            # FIXED: Corrected parameter names
             coordination(
                 traj_path=traj_path,
-                target_atoms="Xe",  
-                bonded_atoms=["Xe"],
+                central_atoms="Xe",
+                target_atoms=["Xe"],
                 custom_cutoffs={('Xe', 'Xe'): 3.0},
                 frame_skip=10,
                 output_dir=output_dir
@@ -608,7 +610,7 @@ class TestParameterVariations:
     @pytest.mark.parametrize("threshold", [0.1, 0.15, 0.2])
     def test_error_analysis_thresholds(self, sample_log_data, threshold):
         """Test error analysis with different thresholds."""
-        df = pd.read_csv(sample_log_data, sep='\s+')  # Changed from delim_whitespace=True
+        df = pd.read_csv(sample_log_data, sep=r'\s+')  # FIXED: Use raw string
         data = df["Epot[eV]"].values
         
         results = error_analysis(data, max_lag=100, threshold=threshold)

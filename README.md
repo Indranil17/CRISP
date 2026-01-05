@@ -68,23 +68,33 @@ The clustering uses DBSCAN (Density-Based Spatial Clustering of Applications wit
 For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensure you have seaborn installed by following the instructions at: [Seaborn Installation](https://seaborn.pydata.org/installing.html).
 
 # Installation
-1. Now, for the testing period, just pull the folder to the local drive, and then go inside the "CRISP" folder locally inside the terminal. 
+- Recommended: install from PyPI (tested on Python 3.9–3.11 on Linux/macOS/Windows)
+	```
+	pip install CRISP-ase
+	```
 
-2. In the same terminal type    
-```
-pip install .
-```
-, then you can run the package in your local system environment globally.
+- From a local checkout (same supported Python versions)
+	```
+	git clone https://github.com/Indranil17/CRISP.git
+	cd CRISP
+	python -m pip install -U pip setuptools wheel
+	python -m pip install .
+	```
 
-or 
-```
-pip install CRISP-ase
-```
-
-3. In a virtual environment as a standalone installation, please install the dependencies via the command line, type 
-```
-pip install ase>=3.23.0 scikit-learn>=1.4.2 seaborn>=0.12.2 joblib>=1.2.0 fpsample>=0.3.3 dscribe>=2.0.0 statsmodels>=0.14.0 pandas>=2.0.3 plotly>=5.9.0 networkx>=3.1
-```
+- Dependencies (if installing manually) 
+	```
+	python -m pip install \
+		ase>=3.23.0 \
+		scikit-learn>=1.4.2 \
+		seaborn>=0.12.2 \
+		joblib>=1.2.0 \
+		fpsample>=0.3.3,<1.0 \
+		dscribe>=2.0.0 \
+		statsmodels>=0.14.0 \
+		pandas>=2.0.3 \
+		plotly>=5.9.0 \
+		networkx>=3.1
+	```
 
 # Current Modules
 
