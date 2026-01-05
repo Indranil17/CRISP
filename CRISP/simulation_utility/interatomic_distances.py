@@ -10,8 +10,10 @@ import numpy as np
 import pickle
 from ase.io import read
 from ase import Atoms
-from typing import Union, Tuple, List, Dict, Any
+from typing import Union, Tuple, List, Dict, Any, Optional
 from joblib import Parallel, delayed
+
+__all__ = ['indices', 'distance_calculation', 'save_distance_matrices', 'calculate_interatomic_distances']
 
 
 def indices(atoms: Atoms, ind: Union[str, List[Union[int, str]], None]) -> np.ndarray:

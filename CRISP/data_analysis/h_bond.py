@@ -9,7 +9,7 @@ import csv
 from joblib import Parallel, delayed
 import argparse
 import os
-from typing import Union, List, Optional, Tuple, Any
+from typing import Union, List, Optional, Tuple, Any, Dict
 import matplotlib.pyplot as plt
 from ase.data import vdw_radii, atomic_numbers, chemical_symbols
 import seaborn as sns
@@ -21,6 +21,8 @@ import plotly.io as pio
 
 pio.renderers.default = 'svg'
 pio.renderers.default = 'notebook'
+
+__all__ = ['indices', 'count_hydrogen_bonds', 'aggregate_data', 'hydrogen_bonds']
 
 
 def indices(atoms, ind: Union[str, List[Union[int, str]]]) -> np.ndarray:
@@ -69,8 +71,42 @@ def indices(atoms, ind: Union[str, List[Union[int, str]]]) -> np.ndarray:
     raise ValueError("Invalid index type")
 
 
-def count_hydrogen_bonds(atoms, acceptor_atoms=["N","O","F"], angle_cutoff=120, h_bond_cutoff=2.4, bond_cutoff=1.6, mic=True, single_h_bond=False):
-
+def count_hydrogen_bonds(
+    atoms,
+    acceptor_atoms: List[str] = None,
+    angle_cutoff: float = 120,
+    h_bond_cutoff: float = 2.4,
+    bond_cutoff: float = 1.6,
+    mic: bool = True,
+    single_h_bond: bool = False
+) -> Tuple[Dict[int, List], int]:
+    """Count hydrogen bonds in an atomic structure.
+    
+    Parameters
+    ----------
+    atoms : ase.Atoms
+        ASE Atoms object containing atomic structure
+    acceptor_atoms : List[str], optional
+        List of acceptor atom symbols (default: ["N", "O", "F"])
+    angle_cutoff : float, optional
+        Minimum angle in degrees for hydrogen bond (default: 120)
+    h_bond_cutoff : float, optional
+        Maximum distance for hydrogen bond in Angstroms (default: 2.4)
+    bond_cutoff : float, optional
+        Maximum distance for covalent bond in Angstroms (default: 1.6)
+    mic : bool, optional
+        Use minimum image convention (default: True)
+    single_h_bond : bool, optional
+        Count only atoms with single hydrogen bonds (default: False)
+        
+    Returns
+    -------
+    Tuple[Dict[int, List], int]
+        Dictionary mapping hydrogen indices to acceptor bonds and count of H-bonds
+    """
+    if acceptor_atoms is None:
+        acceptor_atoms = ["N", "O", "F"]
+    
     indices_hydrogen = indices(atoms, "H")
     indices_acceptor = indices(atoms, acceptor_atoms)
 
@@ -117,7 +153,27 @@ def count_hydrogen_bonds(atoms, acceptor_atoms=["N","O","F"], angle_cutoff=120, 
     return hydrogen_dict, num_hydrogen_bonds
 
 
-def aggregate_data(data, index_map, N):
+def aggregate_data(
+    data: List[Dict[int, List]],
+    index_map: Dict[int, int],
+    N: int
+) -> np.ndarray:
+    """Aggregate hydrogen bond data across multiple frames.
+    
+    Parameters
+    ----------
+    data : List[Dict[int, List]]
+        List of hydrogen bond dictionaries from each frame
+    index_map : Dict[int, int]
+        Mapping from global to local indices
+    N : int
+        Number of unique atoms
+        
+    Returns
+    -------
+    np.ndarray
+        Aggregated hydrogen bond count array
+    """
     """
     Aggregates hydrogen bond data to create correlation matrix and network graph.
     

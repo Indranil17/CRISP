@@ -17,12 +17,18 @@ from scipy.optimize import curve_fit
 import pandas as pd
 import os
 import traceback
+from typing import List, Tuple, Union, Optional, Dict, Any
 from joblib import Parallel, delayed, cpu_count
 
+__all__ = ['read_trajectory_chunk', 'calculate_frame_msd', 'calculate_msd', 'calculate_save_msd', 'msd_analysis']
 
-def read_trajectory_chunk(traj_path, index_slice, frame_skip=1):
-    """
-    Read a chunk of trajectory data in parallel.
+
+def read_trajectory_chunk(
+    traj_path: str,
+    index_slice: str,
+    frame_skip: int = 1
+) -> List:
+    """Read a chunk of trajectory data in parallel.
     
     Parameters
     ----------
@@ -49,7 +55,14 @@ def read_trajectory_chunk(traj_path, index_slice, frame_skip=1):
         print(f"Error reading trajectory chunk {index_slice}: {e}")
         return []
 
-def calculate_frame_msd(frame_idx, current_frame, reference_frame, atom_indices, msd_direction=False):
+
+def calculate_frame_msd(
+    frame_idx: int,
+    current_frame,
+    reference_frame,
+    atom_indices: List[int],
+    msd_direction: bool = False
+) -> Union[Tuple[int, float], Tuple[int, float, float, float]]:
     """
     Calculate MSD for a single frame.
     

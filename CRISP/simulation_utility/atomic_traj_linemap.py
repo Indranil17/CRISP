@@ -12,7 +12,7 @@ from ase.io import read
 import plotly.graph_objects as go
 import plotly.io as pio
 pio.renderers.default = "notebook"
-
+__all__ = ['plot_atomic_trajectory', 'VDW_RADII', 'ELEMENT_COLORS']
 # Dictionary of van der Waals radii for all elements in Ångström
 VDW_RADII = {
     # Period 1

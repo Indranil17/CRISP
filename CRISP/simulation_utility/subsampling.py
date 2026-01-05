@@ -13,7 +13,9 @@ import os
 from dscribe.descriptors import SOAP
 import matplotlib.pyplot as plt
 from joblib import Parallel, delayed
-from typing import Union, List
+from typing import Union, List, Optional
+
+__all__ = ['indices', 'compute_soap', 'create_repres', 'subsample']
 
 
 def indices(atoms, ind: Union[str, List[Union[int, str]]]) -> np.ndarray:
@@ -67,7 +69,12 @@ def indices(atoms, ind: Union[str, List[Union[int, str]]]) -> np.ndarray:
     raise ValueError("Invalid index type")
 
 
-def compute_soap(structure, all_spec, rcut, idx):
+def compute_soap(
+    structure,
+    all_spec: List[str],
+    rcut: float,
+    idx: np.ndarray
+) -> np.ndarray:
     """Compute SOAP descriptors for a given structure.
     
     Parameters
@@ -100,7 +107,12 @@ def compute_soap(structure, all_spec, rcut, idx):
     return np.mean(soap_ind, axis=0)
 
 
-def create_repres(traj_path, rcut=6, ind="all", n_jobs=-1):
+def create_repres(
+    traj_path: List,
+    rcut: float = 6,
+    ind: Union[str, List[Union[int, str]]] = "all",
+    n_jobs: int = -1
+) -> np.ndarray:
     """Create SOAP representation vectors for a trajectory.
     
     Parameters
@@ -129,8 +141,16 @@ def create_repres(traj_path, rcut=6, ind="all", n_jobs=-1):
     return np.array(repres)
 
 
-def subsample(traj_path, n_samples=50, index_type="all", rcut=6.0, file_format=None, 
-             plot_subsample=False, frame_skip=1, output_dir="subsampled_structures"):
+def subsample(
+    traj_path: str,
+    n_samples: int = 50,
+    index_type: Union[str, List[Union[int, str]]] = "all",
+    rcut: float = 6.0,
+    file_format: Optional[str] = None,
+    plot_subsample: bool = False,
+    frame_skip: int = 1,
+    output_dir: str = "subsampled_structures"
+) -> None:
     """Subsample a trajectory using Farthest Point Sampling with SOAP descriptors.
     
     Parameters

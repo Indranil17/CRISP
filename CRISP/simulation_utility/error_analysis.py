@@ -9,11 +9,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import acf
 import warnings
+from typing import Dict, Optional, Any
 
+__all__ = ['optimal_lag', 'vector_acf', 'autocorrelation_analysis', 'block_analysis']
 
-def optimal_lag(acf_values, threshold=0.05):
-    """
-    Find the optimal lag time at which autocorrelation drops below threshold.
+def optimal_lag(acf_values: np.ndarray, threshold: float = 0.05) -> int:
+    """Find the optimal lag time at which autocorrelation drops below threshold.
     
     Parameters
     ----------
@@ -30,7 +31,7 @@ def optimal_lag(acf_values, threshold=0.05):
     Warns
     -----
     UserWarning
-        If autocorrelation function doesn't converge within available data
+        If autocorrelation function does not converge within available data
     """
     for lag, value in enumerate(acf_values):
         if abs(value) < threshold:

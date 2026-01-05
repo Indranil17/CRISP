@@ -14,7 +14,9 @@ import pickle
 import csv
 import matplotlib.pyplot as plt
 import os
-from typing import Union, List
+from typing import Union, List, Optional, Tuple, Dict, Any
+
+__all__ = ['analyze_frame', 'analyze_trajectory']
 
 
 class analyze_frame:
@@ -36,7 +38,15 @@ class analyze_frame:
     custom_frame_index : int, optional
         Specific frame to analyze (default: None, uses last frame)
     """
-    def __init__(self, traj_path, atom_indices, threshold, min_samples, metric='precomputed', custom_frame_index=None):
+    def __init__(
+        self,
+        traj_path: str,
+        atom_indices: Union[str, np.ndarray],
+        threshold: float,
+        min_samples: int,
+        metric: str = 'precomputed',
+        custom_frame_index: Optional[int] = None
+    ) -> None:
         self.traj_path = traj_path
         if isinstance(atom_indices, str):
             atom_indices = np.load(atom_indices)

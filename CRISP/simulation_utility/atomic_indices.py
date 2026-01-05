@@ -8,10 +8,16 @@ and identifying atom pairs within specified cutoff distances.
 import os
 import numpy as np
 import ase.io
-import csv    
+import csv
+from typing import Dict, Tuple, List, Optional
 
+__all__ = ['atom_indices', 'run_atom_indices']
 
-def atom_indices(traj_path, frame_index=0, custom_cutoffs=None):
+def atom_indices(
+    traj_path: str,
+    frame_index: int = 0,
+    custom_cutoffs: Optional[Dict[Tuple[str, str], float]] = None
+) -> Tuple[Dict[str, List[int]], np.ndarray, Dict[Tuple[str, str], List[Tuple[int, int, float]]]]:
     """Extract atom indices by chemical symbol and find atom pairs within specified cutoffs.
     
     Parameters
@@ -67,7 +73,12 @@ def atom_indices(traj_path, frame_index=0, custom_cutoffs=None):
         raise ValueError(f"Error processing atomic structure: {e}. Check if the format is supported by ASE.")
 
 
-def run_atom_indices(traj_path, output_dir, frame_index=0, custom_cutoffs=None):
+def run_atom_indices(
+    traj_path: str,
+    output_dir: str,
+    frame_index: int = 0,
+    custom_cutoffs: Optional[Dict[Tuple[str, str], float]] = None
+) -> None:
     """Run atom index extraction and save results to files.
     
     Parameters
