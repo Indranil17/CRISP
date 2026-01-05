@@ -74,9 +74,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 	```
 - Dependencies (if installing manually) 
 	```
-	pip install ase>=3.23.0 scikit-learn>=1.4.2 seaborn>=0.12.2 joblib>=1.2.0 \
-							fpsample>=0.3.3,<1.0 dscribe>=2.0.0 statsmodels>=0.14.0 pandas>=2.0.3 \
-							plotly>=5.9.0 networkx>=3.1
+	pip install ase>=3.23.0 scikit-learn>=1.4.2 seaborn>=0.12.2 joblib>=1.2.0 fpsample>=0.3.3,<1.0 dscribe>=2.0.0 statsmodels>=0.14.0 pandas>=2.0.3 plotly>=5.9.0 networkx>=3.1
 	```
 - From a local checkout (same supported Python versions)
 	```
