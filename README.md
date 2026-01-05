@@ -73,14 +73,6 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 	pip install CRISP-ase
 	```
 
-- From a local checkout (same supported Python versions)
-	```
-	git clone https://github.com/Indranil17/CRISP.git
-	cd CRISP
-	python -m pip install -U pip setuptools wheel
-	python -m pip install .
-	```
-
 - Dependencies (if installing manually) 
 	```
 	python -m pip install \
@@ -94,6 +86,14 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 	    pandas>=2.0.3 \
 	    plotly>=5.9.0 \
 	    networkx>=3.1
+	```
+
+- From a local checkout (same supported Python versions)
+	```
+	git clone https://github.com/Indranil17/CRISP.git
+	cd CRISP
+	python -m pip install -U pip setuptools wheel
+	python -m pip install .
 	```
 
 # Current Modules
