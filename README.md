@@ -80,7 +80,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 	    scikit-learn>=1.4.2 \
 	    seaborn>=0.12.2 \
 	    joblib>=1.2.0 \
-	    "fpsample>=0.3.3,<1.0" \
+	    fpsample>=0.3.3 \
 	    dscribe>=2.0.0 \
 	    statsmodels>=0.14.0 \
 	    pandas>=2.0.3 \
