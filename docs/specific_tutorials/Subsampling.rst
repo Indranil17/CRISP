@@ -57,7 +57,7 @@ This subsampling technique also serves as a pre-screening tool for molecular dyn
 References
 ----------
 
-.. [1] Christensen, Anders S., and von Lilienfeld, Anatole. "Revised MD17 dataset (rMD17)." Figshare (2020). https://figshare.com/articles/dataset/Revised_MD17_dataset_rMD17_/12672038
+.. [1] Christensen, Anders S., and von Lilienfeld, Anatole. "Revised MD17 dataset (rMD17)." Figshare (2020). `https://figshare.com/articles/dataset/Revised_MD17_dataset_rMD17_/12672038`
 
 .. [2] Bartók, Albert P., Kondor, Risi, and Csányi, Gábor. "On representing chemical environments." *Physical Review B* 87, no. 18 (2013): 184115.
 
