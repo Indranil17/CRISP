@@ -72,7 +72,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 
 2. In the same terminal type    
 ```
-pip install .
+python -m pip install -e .
 ```
 , then you can run the package in your local system environment globally.
 
