@@ -8,7 +8,8 @@ dynamic = ["version"]
 requires-python = ">=3.8"
 readme = "README.md"
 authors = [{ name = "IS", email = "indranilsaha15@gmail.com" }]
-license = { text = "CC-BY-NC-SA-4.0 (see LICENSE)" }
+license = "CC-BY-NC-SA-4.0"
+license-files = ["LICENSE"]
 dependencies = [
     "numpy>=1.24,<2.3", 
     "ase", 
@@ -33,12 +34,13 @@ CRISP = "CRISP.cli:main"
 [tool.setuptools]
 zip-safe = false
 include-package-data = true
-license-files = []  
+ 
 
 [tool.setuptools.packages.find]
 namespaces = false
 where = ["."]
 include = ["CRISP*"]
+exclude = ["CRISP.data"]
 
 [tool.setuptools.package-data]
 CRISP = [
