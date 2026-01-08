@@ -1,0 +1,9 @@
+Si–O–Si Bond-Angle Distribution Analysis
+==================================================
+
+Total measurements: 96600
+Mean angle: 141.7359°
+Median angle: 140.7228°
+Standard deviation: 9.7484°
+Min angle: 113.9068°
+Max angle: 179.4648°
