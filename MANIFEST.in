@@ -2,3 +2,4 @@ include LICENSE
 
 global-exclude *.py[cod] __pycache__ *.so
 recursive-include CRISP/tests *.py
+recursive-include CRISP/data *
