@@ -1,10 +1,9 @@
 Coordination Analysis for O Atoms
 ======================================
 
-Average Coordination Number: 2.50 ± 0.50
+Average Coordination Number: 0.00 ± 0.00
 
 Overall Average Percentages:
-  CN=2: 50.00% ± 0.00%
-  CN=3: 50.00% ± 0.00%
+  CN=0: 100.00% ± 0.00%
 
-Most common coordination number: 2
+Most common coordination number: 0
