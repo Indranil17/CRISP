@@ -1,0 +1,4 @@
+[run]
+omit = */tests/*
+[report]
+omit = */tests/*
