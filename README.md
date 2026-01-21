@@ -70,7 +70,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 # Installation
 - Recommended: install from PyPI (tested on Python 3.9–3.11 on Linux/macOS/Windows)
 	```
-	pip install crisp-ase==1.1.2
+	pip install crisp-ase
     pip install pytest pytest-cov coverage
 	```
 
