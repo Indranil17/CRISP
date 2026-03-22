@@ -70,7 +70,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 # Installation
 - Recommended: install from PyPI (tested on Python 3.9–3.11 on Linux/macOS/Windows)
 	```
-	pip install crisp-ase==1.1.2
+	pip install crisp-ase
     pip install pytest pytest-cov coverage
 	```
 
@@ -85,7 +85,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 - Dependencies (if installing manually) 
 	```
 	python -m pip install ase>=3.23.0 scikit-learn>=1.4.2 seaborn>=0.12.2 joblib>=1.2.0 fpsample>=0.3.3,<1.0 dscribe>=2.0.0 statsmodels>=0.14.0 pandas>=2.0.3 plotly>=5.9.0 networkx>=3.1
-	
+
 	```
 
 # Current Modules
@@ -93,7 +93,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 To learn how to use each of the modules, please visit [examples](https://github.com/Indranil17/CRISP_HOST/tree/main/example).
 Inside the example folder, check the [Notebook](https://github.com/Indranil17/CRISP_HOST/blob/main/example/Introductory_Tutorial/CRISP_Introdcutory_Tutorial.ipynb) to see them in use and also check the other folders of the example folder to see the outputs.
 It has two sub-packages and ten modules.  
-Please see the package's UML map below. 
+Please see the package's structural map below. 
  
 <img src="https://github.com/Indranil17/CRISP_HOST/blob/main/crisp_map.png" width="800">
 

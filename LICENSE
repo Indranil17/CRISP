@@ -1,14 +1,21 @@
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+Creative Commons Attribution 4.0 International (CC BY 4.0)
 
 Copyright (c) 2025 Indranil Saha, Daniel Willimetz, Lukáš Grajciar
+
+Associated DOI: 10.5281/zenodo.16990590
 
 You are free to:
 - Share — copy and redistribute the material in any medium or format
 - Adapt — remix, transform, and build upon the material
+- Use for commercial purposes
 
 Under the following terms:
 - Attribution — You must give appropriate credit, provide a link to the license, and indicate if changes were made.
-- NonCommercial — You may not use the material for commercial purposes.
-- ShareAlike — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+  You should include the project name, authors, and the DOI when attributing, for example:
+  "CRISP — Indranil Saha, Daniel Willimetz, Lukáš Grajciar. DOI: 10.5281/zenodo.16990590. Licensed under CC BY 4.0."
+  
+No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 
-For full license details, see: https://creativecommons.org/licenses/by-nc-sa/4.0/
+For full license details and the legal code, see:
+https://creativecommons.org/licenses/by/4.0/
+https://creativecommons.org/licenses/by/4.0/legalcode
