@@ -4,12 +4,14 @@ import numpy as np
 import os
 import tempfile
 import shutil
+from unittest.mock import patch, MagicMock
 from ase import Atoms
 from ase.io import write
 
 from CRISP.simulation_utility.subsampling import (
     indices,
     compute_soap,
+    subsample,
 )
 
 
@@ -361,5 +363,74 @@ class TestSubsamplingSystemTypes:
             assert len(result) > 0
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+class TestSubsamplingCoverageFinalPush:
+    """Targeted tests to resolve remaining gaps in subsampling.py coverage."""
+    
+    @pytest.fixture
+    def multi_frame_traj(self, tmp_path):
+        """Creates a small trajectory file for integration testing."""
+        traj_path = tmp_path / "test_traj.xyz"
+        frames = []
+        for i in range(5):
+            atoms = Atoms("H2O", positions=np.random.rand(3, 3) + i)
+            atoms.set_cell([10, 10, 10])
+            atoms.set_pbc(True)
+            frames.append(atoms)
+        write(str(traj_path), frames)
+        return str(traj_path)
+    
+    def test_indices_symbol_concatenation(self):
+        """Covers concatenation of multiple symbol searches."""
+        atoms = Atoms("H2O")
+        result = indices(atoms, ["H", "O"])
+        assert len(result) == 3
+        assert isinstance(result, np.ndarray)
+    
+    @patch("matplotlib.pyplot.show")
+    def test_subsample_plotting_and_constraints(
+        self, mock_plt, multi_frame_traj, tmp_path
+    ):
+        """Covers FPS convergence plotting and sample limiting."""
+        out_dir = tmp_path / "sub_results"
+    
+        results = subsample(
+            traj_path=multi_frame_traj,
+            n_samples=100,  # exceeds available frames
+            plot_subsample=True,
+            output_dir=str(out_dir),
+        )
+    
+        assert len(results) == 5  # limited to number of frames
+        assert (out_dir / "subsampled_convergence.png").exists()
+        assert mock_plt.called
+    
+    def test_subsample_with_format_and_single_frame(self, tmp_path):
+        """Covers specific file_format and single-frame handling."""
+        single_frame_path = tmp_path / "single.xyz"
+        atom = Atoms("H", positions=[[0, 0, 0]])
+        write(str(single_frame_path), atom)
+    
+        results = subsample(
+            traj_path=str(single_frame_path),
+            file_format="xyz",
+            n_samples=1,
+            output_dir=str(tmp_path),
+        )
+        assert len(results) == 1
+    
+    @patch("CRISP.simulation_utility.subsampling.write")
+    def test_subsample_write_exception(
+        self, mock_write, multi_frame_traj, tmp_path
+    ):
+        """Covers error handling when saving subsampled structures fails."""
+        mock_write.side_effect = Exception("Mock Write Failure")
+
+        with patch("builtins.print") as mock_print:
+            subsample(multi_frame_traj, n_samples=2, output_dir=str(tmp_path))
+
+            # collect all printed messages and ensure error message is present
+            printed = " ".join(
+                " ".join(str(a) for a in call.args)
+                for call in mock_print.call_args_list
+            )
+            assert "Error saving subsampled structures" in printed

@@ -4,6 +4,8 @@ import numpy as np
 import os
 import tempfile
 import shutil
+import pandas as pd
+from unittest.mock import patch
 from ase import Atoms
 from ase.io import write
 from CRISP.data_analysis.h_bond import (
@@ -12,6 +14,7 @@ from CRISP.data_analysis.h_bond import (
     aggregate_data,
     process_frame,
     hydrogen_bonds,
+    visualize_hydrogen_bonds,
 )
 
 
@@ -320,3 +323,90 @@ class TestHydrogenBondsNumericalStability:
         result = count_hydrogen_bonds(atoms, angle_cutoff=180)
 
         assert isinstance(result, tuple) and len(result) == 2
+
+
+class TestHBondVisualizationAndAggregation:
+    """Tests designed to trigger aggregation and visualization logic."""
+
+    @pytest.fixture
+    def mock_hbond_csv_data(self, tmp_path):
+        """Creates a dummy CSV and npy indices file for visualization tests."""
+        csv_path = tmp_path / "test_hbonds.csv"
+        indices_path = tmp_path / "indices.npy"
+
+        df = pd.DataFrame(
+            {
+                "Frame": [0, 0, 10],
+                "Donor": [0, 3, 0],
+                "Acceptor": [3, 0, 3],
+                "Distance": [2.8, 2.9, 2.7],
+            }
+        )
+        df.to_csv(csv_path, index=False)
+
+        np.save(indices_path, np.array([0, 3]))
+        return str(csv_path), str(indices_path)
+
+    @pytest.fixture
+    def water_trajectory(self, tmp_path):
+        """Create a simple water trajectory reused for visualization tests."""
+        temp_dir = tmp_path
+        traj_path = temp_dir / "water_traj_vis.traj"
+
+        frames = []
+        for _ in range(5):
+            atoms = Atoms("H2O", positions=[[0, 0, 0], [1, 0, 0], [0, 1, 0]])
+            atoms.cell = [10, 10, 10]
+            atoms.pbc = True
+            atoms.positions += np.random.rand(3, 3) * 0.1
+            frames.append(atoms)
+
+        write(traj_path, frames)
+        return str(traj_path)
+
+    @patch("matplotlib.pyplot.show")
+    @patch("plotly.graph_objects.Figure.show")
+    def test_hydrogen_bonds_full_wrapper(
+        self, mock_plotly, mock_plt, water_trajectory, tmp_path
+    ):
+        """Triggers the full wrapper including plots and file generation."""
+        results = hydrogen_bonds(
+            water_trajectory,
+            frame_skip=1,
+            acceptor_atoms=["O"],
+            output_dir=str(tmp_path),
+            time_step=1.0,
+            plot_count=True,
+            plot_heatmap=True,
+            plot_graph_frame=True,
+            plot_graph_average=True,
+        )
+
+        assert len(results) > 0
+        assert (tmp_path / "h_bond_count.png").exists()
+        assert (tmp_path / "h_bond_structure.png").exists()
+        assert (tmp_path / "donor_acceptor_indices.npy").exists()
+
+    @patch("plotly.graph_objects.Figure.write_html")
+    def test_visualization_wrappers(self, mock_write, mock_hbond_csv_data, tmp_path):
+        """Directly exercises the visualization and processing logic."""
+        csv_path, indices_path = mock_hbond_csv_data
+
+        # Average visualization (aggregate_data path)
+        visualize_hydrogen_bonds(
+            csv_path,
+            indices_path,
+            average=True,
+            output_dir=str(tmp_path),
+        )
+
+        # Single-frame visualization (process_frame path)
+        visualize_hydrogen_bonds(
+            csv_path,
+            indices_path,
+            frame_index=0,
+            average=False,
+            output_dir=str(tmp_path),
+        )
+
+        assert mock_write.called

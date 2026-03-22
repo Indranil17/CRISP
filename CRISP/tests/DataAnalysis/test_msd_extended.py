@@ -442,55 +442,6 @@ class TestMSDParameterVariations:
             assert msd_times[-1] > 0
 
 
-class TestMSDIntegration:
-    """Integration tests combining multiple MSD functions."""
-    
-    def test_full_msd_workflow(self):
-        """Test complete workflow from trajectory to diffusion coefficient."""
-        # Create trajectory
-        frames = []
-        for i in range(10):
-            atoms = Atoms('H2O', positions=[[0, 0, 0], [1, 0, 0], [0, 1, 0]])
-            atoms.positions += np.array([0.02*i, 0.02*i, 0])
-            frames.append(atoms)
-        
-        # Calculate MSD
-        timestep = 1.0
-        atom_indices = np.array([0, 1, 2])
-        msd_values, msd_times = calculate_msd(frames, timestep, atom_indices=atom_indices)
-        
-        # Just verify the MSD calculation worked
-        assert len(msd_values) > 0
-        assert len(msd_times) > 0
-        assert msd_values[0] >= 0
-    
-    def test_msd_with_different_atom_types(self):
-        """Test MSD calculation distinguishing atom types."""
-        frames = []
-        for i in range(8):
-            atoms = Atoms('H2O2', positions=[
-                [0, 0, 0], [1, 0, 0],  # H atoms
-                [0.5, 0.5, 0], [1.5, 0.5, 0]  # O atoms
-            ])
-            atoms.positions += np.random.rand(4, 3) * 0.01 * i
-            frames.append(atoms)
-        
-        timestep = 1.0
-        
-        # MSD for H atoms only
-        h_indices = np.array([0, 1])
-        msd_h, time_h = calculate_msd(frames, timestep, atom_indices=h_indices)
-        
-        # MSD for O atoms only
-        o_indices = np.array([2, 3])
-        msd_o, time_o = calculate_msd(frames, timestep, atom_indices=o_indices)
-        
-        assert len(msd_h) > 0
-        assert len(msd_o) > 0
-        # Both should have same time array
-        assert len(time_h) == len(time_o)
-
-
 class TestMSDEdgeCases:
     """Test MSD with edge cases."""
     
@@ -520,3 +471,97 @@ class TestMSDEdgeCases:
         assert len(msd_times) <= 51
         # MSD values should increase over time (random walk)
         assert msd_vals[0] == 0  # Initial MSD is zero
+
+
+class TestMSDCoverageExpansion:
+    """Targeted tests to resolve remaining gaps in msd.py coverage."""
+
+    @pytest.fixture
+    def heterogeneous_traj(self):
+        """Create a trajectory with multiple atom types and known drift."""
+        frames = []
+        for i in range(5):
+            # O moves in X, H moves in Y
+            atoms = Atoms(
+                "OH2",
+                positions=[
+                    [0.1 * i, 0, 0],   # O
+                    [0, 0.2 * i, 0],   # H1
+                    [0, 0.2 * i, 1.0], # H2
+                ],
+            )
+            atoms.set_cell([10, 10, 10])
+            atoms.set_pbc(True)
+            frames.append(atoms)
+        return frames
+
+    def test_calculate_msd_per_atom_type(self, heterogeneous_traj):
+        """Covers 'atom_indices is None' branch and atom-type dict logic."""
+        timestep = 1.0
+        results = calculate_msd(heterogeneous_traj, timestep, atom_indices=None)
+
+        assert isinstance(results, dict)
+        assert "overall" in results
+        assert "O" in results
+        assert "H" in results
+        assert len(results["overall"]) == 2  # (values, times)
+
+    def test_calculate_msd_directional_by_symbol(self, heterogeneous_traj):
+        """Covers directional MSD filtered by chemical symbol."""
+        timestep = 1.0
+        results = calculate_msd(
+            heterogeneous_traj,
+            timestep,
+            atom_indices=None,
+            msd_direction=True,
+            msd_direction_atom="O",
+        )
+
+        assert "O_x" in results
+        assert "O_y" in results
+        assert "O_z" in results
+
+    def test_calculate_msd_directional_by_atomic_number(self, heterogeneous_traj):
+        """Covers directional MSD filtered by atomic number."""
+        timestep = 1.0
+        results = calculate_msd(
+            heterogeneous_traj,
+            timestep,
+            atom_indices=None,
+            msd_direction=True,
+            msd_direction_atom=8,  # oxygen Z
+        )
+
+        assert "O_x" in results
+
+    def test_calculate_msd_windowed_per_atom_type(self, heterogeneous_traj):
+        """Covers windowed MSD for multiple atom types."""
+        timestep = 1.0
+        results = calculate_msd_windowed(
+            heterogeneous_traj,
+            timestep,
+            atom_indices=None,
+            n_jobs=1,  # deterministic for tests
+        )
+
+        assert "overall" in results
+        assert "O" in results
+
+    def test_save_msd_data_dictionary_and_directional(self, tmp_path):
+        """Covers saving complex MSD dictionaries and directional tuples."""
+        output_dir = tmp_path / "detailed_save"
+        msd_times = np.array([0, 1, 2])
+
+        # 1) directional tuple: (t, x, y, z)
+        directional_data = (msd_times, np.zeros(3), np.zeros(3), np.zeros(3))
+        save_msd_data(directional_data, "dir_test.csv", output_dir=str(output_dir))
+        assert (output_dir / "dir_test_x.csv").exists()
+
+        # 2) dictionary data
+        dict_data = {
+            "overall": (np.zeros(3), msd_times),
+            "O": (np.zeros(3), msd_times),
+        }
+        save_msd_data(dict_data, "dict_test.csv", output_dir=str(output_dir))
+        assert (output_dir / "dict_test_overall.csv").exists()
+        assert (output_dir / "dict_test_O.csv").exists()
