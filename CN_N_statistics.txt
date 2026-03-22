@@ -1,10 +1,9 @@
 Coordination Analysis for N Atoms
 ======================================
 
-Average Coordination Number: 1.00 ± 1.00
+Average Coordination Number: 1.00 ± 0.00
 
 Overall Average Percentages:
-  CN=0: 50.00% ± 0.00%
-  CN=2: 50.00% ± 0.00%
+  CN=1: 100.00% ± 0.00%
 
-Most common coordination number: 0
+Most common coordination number: 1

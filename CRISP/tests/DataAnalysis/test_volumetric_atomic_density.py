@@ -267,12 +267,12 @@ class TestVolumetricDensitySaveDensity:
             assert os.path.exists(density_file)
             
             # Load and verify density data
-            data = np.load(density_file)
-            assert 'density' in data
-            assert 'edges' in data
-            assert 'cell' in data
-            assert 'nbins' in data
-            assert 'selected_indices' in data
+            with np.load(density_file) as data:
+                assert 'density' in data
+                assert 'edges' in data
+                assert 'cell' in data
+                assert 'nbins' in data
+                assert 'selected_indices' in data
         finally:
             shutil.rmtree(temp_dir)
 
