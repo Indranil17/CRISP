@@ -1,0 +1,9 @@
+Coordination Analysis for H Atoms
+======================================
+
+Average Coordination Number: 0.00 ± 0.00
+
+Overall Average Percentages:
+  CN=0: 100.00% ± 0.00%
+
+Most common coordination number: 0

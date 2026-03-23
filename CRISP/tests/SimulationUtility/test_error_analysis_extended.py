@@ -1,10 +1,14 @@
 """Extended tests for error analysis module."""
 import pytest
 import numpy as np
+import matplotlib.pyplot as plt
 
 from CRISP.simulation_utility.error_analysis import (
     optimal_lag,
     vector_acf,
+    autocorrelation_analysis,
+    block_analysis,
+    error_analysis,
 )
 
 
@@ -147,5 +151,42 @@ class TestErrorAnalysisIntegration:
             assert lag >= 0
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+class TestErrorAnalysisAdvanced:
+    """Advanced tests for statistical error estimation and plotting."""
+
+    def test_autocorrelation_analysis_1d(self):
+        """Test ACF analysis for 1D scalar data."""
+        data = np.linspace(0, 10, 100) + np.random.normal(0, 0.1, 100)
+        results = autocorrelation_analysis(data, max_lag=10, plot_acf=True)
+
+        assert "tau_int" in results
+        assert results["optimal_lag"] >= 0
+        plt.show()  # ensure plot path is exercised
+
+    def test_block_analysis_logic(self):
+        """Test block averaging functionality and convergence."""
+        data = np.random.normal(5.0, 1.0, 500)
+        results = block_analysis(data, convergence_tol=0.1, plot_blocks=True)
+
+        assert "block_err" in results
+        assert results["converged_blocks"] > 0
+        plt.show()
+
+    def test_block_analysis_warning_path(self):
+        """Test warning trigger when block averaging does not converge."""
+        data = np.cumsum(np.random.normal(0, 1, 50))
+
+        with pytest.warns(UserWarning, match="Block averaging did not fully converge"):
+            block_analysis(data, convergence_tol=1e-10)
+
+    def test_comprehensive_wrapper(self):
+        """Test the main error_analysis wrapper function."""
+        data = np.random.random(200)
+        results = error_analysis(data, max_lag=20, plot=True)
+
+        assert "acf_results" in results
+        assert "block_results" in results
+        assert results["mean"] is not None
+        plt.show()
+
+

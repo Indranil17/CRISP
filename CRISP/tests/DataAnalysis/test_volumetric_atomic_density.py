@@ -6,6 +6,7 @@ import tempfile
 import shutil
 from ase import Atoms
 from ase.io import write
+from pathlib import Path
 
 from CRISP.data_analysis.volumetric_atomic_density import (
     create_density_map,
@@ -266,12 +267,12 @@ class TestVolumetricDensitySaveDensity:
             assert os.path.exists(density_file)
             
             # Load and verify density data
-            data = np.load(density_file)
-            assert 'density' in data
-            assert 'edges' in data
-            assert 'cell' in data
-            assert 'nbins' in data
-            assert 'selected_indices' in data
+            with np.load(density_file) as data:
+                assert 'density' in data
+                assert 'edges' in data
+                assert 'cell' in data
+                assert 'nbins' in data
+                assert 'selected_indices' in data
         finally:
             shutil.rmtree(temp_dir)
 
@@ -459,5 +460,74 @@ class TestVolumetricDensityIntegration:
             shutil.rmtree(temp_dir)
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+def test_create_density_map_missing_traj_raises(tmp_path):
+    """Non‑existent trajectory file should raise."""
+    bad_traj = tmp_path / "does_not_exist.traj"
+    indices = tmp_path / "idx.npy"
+    np.save(indices, np.array([0]))
+    with pytest.raises(Exception):
+        create_density_map(traj_path=str(bad_traj), indices_path=str(indices))
+
+
+def test_create_density_map_missing_indices_raises(tmp_path):
+    """Non‑existent indices file should raise."""
+    traj = tmp_path / "t.traj"
+    atoms = Atoms('H', positions=[[0., 0., 0.]])
+    atoms.set_cell([10, 10, 10])
+    atoms.set_pbc([True, True, True])
+    write(traj, atoms)
+    with pytest.raises(Exception):
+        create_density_map(traj_path=str(traj), indices_path=str(tmp_path / "no.npy"))
+
+
+def test_create_density_map_indices_out_of_range(tmp_path):
+    """Indices larger than number of atoms should be rejected."""
+    traj = tmp_path / "t.traj"
+    atoms = Atoms('H2O', positions=[[0, 0, 0], [0.9, 0, 0], [0.2, 0.9, 0]])
+    atoms.set_cell([10, 10, 10])
+    atoms.set_pbc([True, True, True])
+    write(traj, atoms)
+    idx = tmp_path / "idx.npy"
+    np.save(idx, np.array([10]))  # clearly invalid
+    with pytest.raises(Exception):
+        create_density_map(traj_path=str(traj), indices_path=str(idx))
+
+
+@pytest.mark.parametrize("nbins", [0, -1])
+def test_create_density_map_invalid_nbins(nbins, tmp_path):
+    """Invalid nbins values should trigger validation branch."""
+    traj = tmp_path / "t.traj"
+    atoms = Atoms('H', positions=[[0., 0., 0.]])
+    atoms.set_cell([10, 10, 10])
+    atoms.set_pbc([True, True, True])
+    write(traj, atoms)
+    idx = tmp_path / "idx.npy"
+    np.save(idx, np.array([0]))
+    with pytest.raises(Exception):
+        create_density_map(traj_path=str(traj), indices_path=str(idx), nbins=nbins)
+
+
+def test_create_density_map_frame_skip_zero_raises(tmp_path):
+    """frame_skip=0 is invalid and should raise."""
+    traj = tmp_path / "t.traj"
+    atoms = Atoms('H', positions=[[0., 0., 0.]])
+    atoms.set_cell([10, 10, 10])
+    atoms.set_pbc([True, True, True])
+    write(traj, atoms)
+    idx = tmp_path / "idx.npy"
+    np.save(idx, np.array([0]))
+    with pytest.raises(Exception):
+        create_density_map(traj_path=str(traj), indices_path=str(idx), frame_skip=0)
+
+
+def test_create_density_map_negative_frame_skip_ok(tmp_path):
+    """Negative frame_skip is currently accepted; just ensure it runs."""
+    traj = tmp_path / "t.traj"
+    atoms = Atoms('H', positions=[[0., 0., 0.]])
+    atoms.set_cell([10, 10, 10])
+    atoms.set_pbc([True, True, True])
+    write(traj, atoms)
+    idx = tmp_path / "idx.npy"
+    np.save(idx, np.array([0]))
+    fig = create_density_map(traj_path=str(traj), indices_path=str(idx), frame_skip=-1)
+    assert fig is not None

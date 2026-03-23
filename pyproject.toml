@@ -3,9 +3,8 @@ requires = ["setuptools>=61,<83", "wheel", "versioningit~=3.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "crisp-ase"  
-dynamic = ["version"]
-requires-python = ">=3.8"
+name = "crisp-ase"
+version = "1.1.4"
 readme = "README.md"
 authors = [{ name = "IS", email = "indranilsaha15@gmail.com" }]
 license = "CC-BY-NC-SA-4.0"

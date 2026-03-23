@@ -6,11 +6,21 @@ import tempfile
 import shutil
 from ase import Atoms
 from ase.io import write
+import matplotlib
+matplotlib.use("Agg")  # ensure plotting works headless
 
 try:
     from CRISP.data_analysis.clustering import (
         analyze_frame,
         analyze_trajectory,
+        create_html_visualization,
+        calculate_silhouette_score,
+        extract_cluster_info,
+        print_cluster_summary,
+        save_frame_info_to_file,
+        save_analysis_results,
+        plot_analysis_results,
+        cluster_analysis,
     )
     ASE_AVAILABLE = True
 except ImportError:
@@ -133,6 +143,129 @@ class TestClusteringExtended:
         finally:
             shutil.rmtree(temp_dir)
 
+    def test_find_clusters_without_distance_matrix_raises(self, tmp_path):
+        """Calling find_clusters before distance matrix should fail."""
+        traj_file = tmp_path / "test.traj"
+        atoms = Atoms("H2O", positions=[[0, 0, 0], [0.96, 0, 0], [0.24, 0.93, 0]])
+        atoms.set_cell([10, 10, 10])
+        atoms.set_pbc([True, True, True])
+        write(traj_file, atoms)
+
+        analyzer = analyze_frame(
+            traj_path=str(traj_file),
+            atom_indices=np.array([0, 1, 2]),
+            threshold=2.5,
+            min_samples=2,
+        )
+        with pytest.raises(ValueError):
+            analyzer.find_clusters()
+
+    def test_analyze_structure_creates_outputs(self, tmp_path):
+        """Exercise analyze_structure, including HTML + pickle output."""
+        traj_file = tmp_path / "test.traj"
+        atoms = Atoms("H2O", positions=[[0, 0, 0], [0.96, 0, 0], [0.24, 0.93, 0]])
+        atoms.set_cell([10, 10, 10])
+        atoms.set_pbc([True, True, True])
+        write(traj_file, atoms)
+
+        analyzer = analyze_frame(
+            traj_path=str(traj_file),
+            atom_indices=np.array([0, 1, 2]),
+            threshold=2.5,
+            min_samples=2,
+        )
+        html_path = tmp_path / "vis.html"
+        result = analyzer.analyze_structure(save_html_path=str(html_path), output_dir=str(tmp_path))
+        assert result is not None
+        assert html_path.exists()
+        assert (tmp_path / "single_frame_analysis.pkl").exists()
+
+    def test_save_and_plot_analysis_results(self, tmp_path):
+        """Test saving analysis results and generating plots."""
+        mock_results = [
+            [0, 2, 1, 0.75, 4.0],
+            [10, 2, 0, 0.80, 4.5],
+            [20, 3, 2, 0.65, 3.0],
+        ]
+
+        pickle_path = save_analysis_results(
+            analysis_results=mock_results,
+            output_dir=str(tmp_path),
+            output_prefix="mock_results",
+        )
+
+        assert os.path.exists(os.path.join(tmp_path, "mock_results.csv"))
+        assert os.path.exists(os.path.join(tmp_path, "mock_results.txt"))
+        assert os.path.exists(pickle_path)
+
+        from unittest.mock import patch
+        with patch("matplotlib.pyplot.show") as mock_show:
+            plot_analysis_results(pickle_file=pickle_path, output_dir=str(tmp_path))
+            mock_show.assert_called_once()
+
+        assert os.path.exists(os.path.join(tmp_path, "mock_results_plot.png"))
+
+    def test_cluster_analysis_wrapper_single_mode(self, tmp_path):
+        """Test cluster_analysis in 'single' mode."""
+        traj_file = tmp_path / "test_wrapper.traj"
+        atoms = Atoms("H2O", positions=[[0, 0, 0], [0.96, 0, 0], [0.24, 0.93, 0]])
+        atoms.set_cell([10, 10, 10])
+        atoms.set_pbc([True, True, True])
+        write(traj_file, atoms)
+
+        indices = np.array([0, 1, 2])
+
+        result = cluster_analysis(
+            traj_path=str(traj_file),
+            indices_path=indices,
+            threshold=2.5,
+            min_samples=2,
+            mode="single",
+            output_dir=str(tmp_path),
+        )
+
+        assert result is not None
+        assert "num_clusters" in result
+
+    def test_cluster_analysis_wrapper_trajectory_mode(self, tmp_path):
+        """Test cluster_analysis in 'trajectory' mode."""
+        traj_file = tmp_path / "test_wrapper_traj.traj"
+        atoms = Atoms("H2O", positions=[[0, 0, 0], [0.96, 0, 0], [0.24, 0.93, 0]])
+        atoms.set_cell([10, 10, 10])
+        atoms.set_pbc([True, True, True])
+        write(traj_file, atoms)  # single frame is enough to hit the code path
+
+        indices = np.array([0, 1, 2])
+
+        results = cluster_analysis(
+            traj_path=str(traj_file),
+            indices_path=indices,
+            threshold=2.5,
+            min_samples=2,
+            mode="trajectory",
+            output_dir=str(tmp_path),
+            frame_skip=1,
+        )
+
+        assert results is None
+        traj_dir = tmp_path / "trajectory"
+        assert traj_dir.exists()
+        # first‑frame HTML visualization should have been created
+        html_files = list(traj_dir.glob("*first_frame_clusters.html"))
+        assert html_files
+
+    def test_calculate_silhouette_score_edge_cases(self):
+        """Test silhouette score calculation edge cases."""
+        dm = np.zeros((3, 3))
+
+        labels_all_outliers = np.array([-1, -1, -1])
+        score1 = calculate_silhouette_score(dm, labels_all_outliers)
+        assert score1 == 0
+
+        labels_one_valid = np.array([0, -1, -1])
+        score2 = calculate_silhouette_score(dm, labels_one_valid)
+        assert score2 == 0
+
 
 @pytest.mark.skipif(not ASE_AVAILABLE, reason="ASE not available")
 class TestClusteringEdgeCases:
@@ -208,5 +341,4 @@ class TestClusteringEdgeCases:
             shutil.rmtree(temp_dir)
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+

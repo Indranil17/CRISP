@@ -4,6 +4,7 @@ import numpy as np
 import os
 import tempfile
 import shutil
+from unittest.mock import patch   # <-- add this
 from ase import Atoms
 from ase.io import write
 from CRISP.data_analysis.contact_coordination import (
@@ -463,3 +464,100 @@ class TestCoordinationNumericalStability:
         result = coordination_frame(atoms, central_atoms='O', target_atoms='H', mic=True)
         
         assert isinstance(result, dict)
+
+
+class TestContactsAndPlottingExecution:
+    """Tests for the contacts pipeline and plotting functionalities."""
+
+    @pytest.fixture
+    def sample_trajectory(self):
+        """Fixture to generate a temporary trajectory for testing."""
+        temp_dir = tempfile.mkdtemp()
+        traj_path = os.path.join(temp_dir, "sample_traj.traj")
+
+        frames = []
+        for _ in range(3):
+            atoms = Atoms(
+                "H2O",
+                positions=[[0, 0, 0], [0.96, 0, 0], [0.24, 0.93, 0]],
+            )
+            atoms.cell = [10, 10, 10]
+            atoms.pbc = True
+            atoms.positions += np.random.rand(3, 3) * 0.1
+            frames.append(atoms)
+
+        write(traj_path, frames)
+        yield traj_path, temp_dir
+        shutil.rmtree(temp_dir)
+
+    def test_contacts_frame_core_execution(self):
+        """Test the contacts_frame function to ensure matrix generation."""
+        atoms = Atoms(
+            "H2O",
+            positions=[[0, 0, 0], [0.96, 0, 0], [0.24, 0.93, 0]],
+        )
+        atoms.cell = [10, 10, 10]
+        atoms.pbc = True
+
+        sub_dm, cutoff_matrix, ind_central, ind_target = contacts_frame(
+            atoms, central_atoms="O", target_atoms="H", custom_cutoffs=None
+        )
+
+        assert sub_dm is not None
+        assert cutoff_matrix is not None
+        assert len(ind_central) == 1
+        assert len(ind_target) == 2
+
+    @patch("matplotlib.pyplot.show")
+    def test_contacts_full_pipeline_with_outputs(self, mock_show, sample_trajectory):
+        """Test the main contacts wrapper including plotting and saving."""
+        traj_path, temp_dir = sample_trajectory
+
+        sub_dm_total, contact_matrix = contacts(
+            traj_path=traj_path,
+            central_atoms="O",
+            target_atoms="H",
+            custom_cutoffs=None,
+            frame_skip=1,
+            plot_distance_matrix=True,
+            plot_contacts=True,
+            time_step=1.0,
+            save_data=True,
+            output_dir=temp_dir,
+        )
+
+        assert sub_dm_total is not None
+        assert contact_matrix is not None
+
+        # output data files
+        assert os.path.exists(os.path.join(temp_dir, "sub_dm_total.npy"))
+        assert os.path.exists(os.path.join(temp_dir, "contact_matrix.npy"))
+        # plotly heatmaps and matplotlib figure
+        assert os.path.exists(os.path.join(temp_dir, "O_heatmap_distance.html"))
+        assert os.path.exists(os.path.join(temp_dir, "O_heatmap_contacts.html"))
+        assert os.path.exists(os.path.join(temp_dir, "average_contact_analysis.png"))
+        mock_show.assert_called_once()
+
+    @patch("matplotlib.pyplot.show")
+    def test_coordination_plotting_execution(self, mock_show, sample_trajectory):
+        """Test the coordination wrapper specifically for plot generation."""
+        traj_path, temp_dir = sample_trajectory
+
+        results = coordination(
+            traj_path=traj_path,
+            central_atoms="O",
+            target_atoms="H",
+            custom_cutoffs=None,
+            frame_skip=1,
+            plot_cn=True,
+            output_dir=temp_dir,
+        )
+
+        assert results is not None
+
+        # coordination number plots and statistics
+        assert os.path.exists(os.path.join(temp_dir, "CN_time_series.png"))
+        assert os.path.exists(os.path.join(temp_dir, "CN_distribution.png"))
+        assert os.path.exists(os.path.join(temp_dir, "CN_distribution.html"))
+        assert os.path.exists(os.path.join(temp_dir, "CN_O_statistics.txt"))
+        mock_show.assert_called()
