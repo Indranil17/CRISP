@@ -51,7 +51,7 @@ jobs:
           pytest -v --cov=CRISP --cov-report=xml --color=yes CRISP/tests/
 
       - name: CodeCov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           file: ./coverage.xml
           flags: unittests
