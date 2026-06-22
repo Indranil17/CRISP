@@ -20,7 +20,7 @@ jobs:
         python-version: [3.9, "3.10", "3.11"]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Additional info about the build
         shell: bash
         run: |
