@@ -14,7 +14,7 @@ CRISP
 
 # Citation
 If you use CRISP in your research, please cite the following publication:
-I. Saha, D. Willimetz and L. Grajciar, "CRISP: Enhancing ASE Workflows With Advanced Molecular Simulation Post-Processing," *Journal of Computational Chemistry* 47, no. 13 (2026): e70384, https://doi.org/10.1002/jcc.70384.
+- I. Saha, D. Willimetz and L. Grajciar, "CRISP: Enhancing ASE Workflows With Advanced Molecular Simulation Post-Processing," *Journal of Computational Chemistry* 47, no. 13 (2026): e70384, https://doi.org/10.1002/jcc.70384.
 
 ## What is CRISP?
 CRISP is a post-simulation analysis package built on the Atomic Simulation Environment (ASE). It is designed for efficient and insightful analysis of molecular dynamics (MD) and other simulations, enabling in-depth exploration with just a few lines of code, including powerful visualisation options.
