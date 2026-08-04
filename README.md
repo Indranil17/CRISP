@@ -12,6 +12,10 @@ CRISP
 
 # CRISP: Enhancing ASE Workflows with Advanced Molecular Simulation Post-Processing
 
+# Citation
+If you use CRISP in your research, please cite the following publication:
+I. Saha, D. Willimetz and L. Grajciar, "CRISP: Enhancing ASE Workflows With Advanced Molecular Simulation Post-Processing," *Journal of Computational Chemistry* 47, no. 13 (2026): e70384, https://doi.org/10.1002/jcc.70384.
+
 ## What is CRISP?
 CRISP is a post-simulation analysis package built on the Atomic Simulation Environment (ASE). It is designed for efficient and insightful analysis of molecular dynamics (MD) and other simulations, enabling in-depth exploration with just a few lines of code, including powerful visualisation options.
 
@@ -96,24 +100,6 @@ It has two sub-packages and ten modules.
 Please see the package's structural map below. 
  
 <img src="https://github.com/Indranil17/CRISP_HOST/blob/main/crisp_map.png" width="800">
-
-# Citation
-If you use CRISP in your research, please cite the following publication:
-
-I. Saha, D. Willimetz and L. Grajciar, "CRISP: Enhancing ASE Workflows With Advanced Molecular Simulation Post-Processing," *Journal of Computational Chemistry* 47, no. 13 (2026): e70384, https://doi.org/10.1002/jcc.70384.
-
-```bibtex
-@article{Saha2026CRISP,
-  author  = {Saha, I. and Willimetz, D. and Grajciar, L.},
-  title   = {CRISP: Enhancing ASE Workflows With Advanced Molecular Simulation Post-Processing},
-  journal = {Journal of Computational Chemistry},
-  volume  = {47},
-  number  = {13},
-  pages   = {e70384},
-  year    = {2026},
-  doi     = {10.1002/jcc.70384},
-  url     = {[https://doi.org/10.1002/jcc.70384](https://doi.org/10.1002/jcc.70384)}
-}
 
 # Acknowledgments
 The package is from the (Nano)Materials modelling group, at Charles University.  
