@@ -12,7 +12,7 @@ CRISP
 
 # CRISP: Enhancing ASE Workflows with Advanced Molecular Simulation Post-Processing
 
-# Citation
+### Citation
 If you use CRISP in your research, please cite the following publication:
 
 I. Saha, D. Willimetz and L. Grajciar, "CRISP: Enhancing ASE Workflows With Advanced Molecular Simulation Post-Processing," *Journal of Computational Chemistry* 47, no. 13 (2026): e70384, https://doi.org/10.1002/jcc.70384.
