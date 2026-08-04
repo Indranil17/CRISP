@@ -76,7 +76,7 @@ For interactive 3D plots of clustering, CRISP utilises the seaborn package. Ensu
 
 - From a local checkout (same supported Python versions)
 	```
-	git clone https://github.com/Indranil17/CRISP.git
+	git clone [https://github.com/Indranil17/CRISP.git](https://github.com/Indranil17/CRISP.git)
 	cd CRISP
 	python -m pip install -U pip setuptools wheel
 	python -m pip install .
