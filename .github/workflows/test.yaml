@@ -28,7 +28,11 @@ jobs:
           df -h
           ulimit -a
 
-      - uses: mamba-org/setup-micromamba@v3
+      - name: Setup micromamba (attempt 1)
+        if: runner.os == 'Windows'
+        id: setup-micromamba-windows-attempt-1
+        continue-on-error: true
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: devtools/conda-envs/test_env.yaml
           environment-name: test
@@ -38,6 +42,35 @@ jobs:
               - conda-forge
           create-args: >- 
             python=${{ matrix.python-version }}
+          micromamba-version: 2.8.1-1
+
+      - name: Setup micromamba (retry)
+        if: runner.os == 'Windows' && steps.setup-micromamba-windows-attempt-1.outcome == 'failure'
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: devtools/conda-envs/test_env.yaml
+          environment-name: test
+          init-shell: bash
+          condarc: |
+            channels:
+              - conda-forge
+          create-args: >- 
+            python=${{ matrix.python-version }}
+          micromamba-version: 2.8.1-1
+
+      - name: Setup micromamba
+        if: runner.os != 'Windows'
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: devtools/conda-envs/test_env.yaml
+          environment-name: test
+          init-shell: bash
+          condarc: |
+            channels:
+              - conda-forge
+          create-args: >- 
+            python=${{ matrix.python-version }}
+          micromamba-version: 2.8.1-1
 
       - name: Install package
         shell: bash -l {0}
